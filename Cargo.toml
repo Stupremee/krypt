@@ -3,7 +3,12 @@ name = "krypt"
 version = "0.1.0"
 authors = ["Justus K. <justus.k@protonmail.com>"]
 edition = "2018"
-
-# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+license = "GPL"
+description = "Krypt is swiss-army knife for encoding, decoding, encryption, decryption and hashing in the terminal."
+homepage = "https://github.com/Stupremee/krypt"
+documentation = "https://docs.rs/krypt"
+repository = "https://github.com/Stupremee/krypt"
 
 [dependencies]
+clap = "2.33.0"
+ansi_term = "0.12.1"

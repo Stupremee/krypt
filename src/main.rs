@@ -1,3 +1,9 @@
+#[macro_use]
+extern crate clap;
+extern crate ansi_term;
+
+mod log;
+
 fn main() {
-    println!("Hello, world!");
+    info!("hello world");
 }
