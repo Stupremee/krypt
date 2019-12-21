@@ -1,22 +1,22 @@
 use clap::{app_from_crate, App, Arg};
 
-#[derive(Debug)]
-pub(crate) struct Options {
-    input: Option<String>,
-    subcommand: Mode,
+#[derive(Debug, Clone)]
+pub struct Options {
+    pub input: Option<String>,
+    pub subcommand: Mode,
 }
 
-#[derive(Debug)]
-pub(crate) enum Mode {
+#[derive(Debug, Clone)]
+pub enum Mode {
     Hashing(Hashing),
 }
 
-#[derive(Debug)]
-pub(crate) struct Hashing {
-    hash: String,
+#[derive(Debug, Clone)]
+pub struct Hashing {
+    pub hash: String,
 }
 
-pub(crate) fn compile_arguments() -> Options {
+pub fn compile_arguments() -> Options {
     let matches = app_from_crate!()
         .arg(Arg::from_usage(
             "-i, --input=[FILE] 'Sets the input of the operation.'",
