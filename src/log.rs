@@ -3,13 +3,13 @@ macro_rules! log {
     ($level:ident, $msg:expr, $($args:tt)*) => {
         let prefix = log!(@prefix, $level);
         let message = ansi_term::Style::new().bold().paint(format!($msg, $($args)*));
-        println!("{}{}", prefix, message);
+        eprintln!("{}{}", prefix, message);
     };
 
     ($level:ident, $msg:expr) => {
         let prefix = log!(@prefix, $level);
         let message = ansi_term::Style::new().bold().paint($msg);
-        println!("{}{}", prefix, message);
+        eprintln!("{}{}", prefix, message);
     };
 
     (@prefix, warn) => {
