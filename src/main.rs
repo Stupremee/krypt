@@ -41,7 +41,7 @@ fn execute_hash(h: app::Hashing, data: Vec<u8>) {
         if h.raw_output {
             print_bytes(result);
         } else {
-            println!("{}", hex::encode(result));
+            print!("{}", hex::encode(result));
         }
     } else {
         error!(
@@ -68,7 +68,7 @@ fn execute_encode(e: app::Encode, data: Vec<u8>) {
             }
         } else {
             let result = encoder.encode(data);
-            println!("{}", result);
+            print!("{}", result);
         }
     } else {
         error!(
