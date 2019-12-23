@@ -1,13 +1,13 @@
 #[macro_export]
 macro_rules! log {
     ($level:ident, $msg:expr, $($args:tt)*) => {
-        let prefix = log!(@prefix, $level);
+        let prefix = $crate::log!(@prefix, $level);
         let message = ansi_term::Style::new().bold().paint(format!($msg, $($args)*));
         eprintln!("{}{}", prefix, message);
     };
 
     ($level:ident, $msg:expr) => {
-        let prefix = log!(@prefix, $level);
+        let prefix = $crate::log!(@prefix, $level);
         let message = ansi_term::Style::new().bold().paint($msg);
         eprintln!("{}{}", prefix, message);
     };
@@ -32,43 +32,43 @@ macro_rules! log {
 #[macro_export]
 macro_rules! warn {
     ($msg:expr, $($args:tt)*) => {
-        log!(warn, $msg, $($args)*)
+        $crate::log!(warn, $msg, $($args)*)
     };
 
     ($msg:expr) => {
-        log!(warn, $msg)
+        $crate::log!(warn, $msg)
     };
 }
 
 #[macro_export]
 macro_rules! error {
     ($msg:expr, $($args:tt)*) => {
-        log!(error, $msg, $($args)*)
+        $crate::log!(error, $msg, $($args)*)
     };
 
     ($msg:expr) => {
-        log!(error, $msg)
+        $crate::log!(error, $msg)
     };
 }
 
 #[macro_export]
 macro_rules! debug {
     ($msg:expr, $($args:tt)*) => {
-        log!(debug, $msg, $($args)*)
+        $crate::log!(debug, $msg, $($args)*)
     };
 
     ($msg:expr) => {
-        log!(debug, $msg)
+        $crate::log!(debug, $msg)
     };
 }
 
 #[macro_export]
 macro_rules! info {
     ($msg:expr, $($args:tt)*) => {
-        log!(info, $msg, $($args)*)
+        $crate::log!(info, $msg, $($args)*)
     };
 
     ($msg:expr) => {
-        log!(info, $msg)
+        $crate::log!(info, $msg)
     };
 }

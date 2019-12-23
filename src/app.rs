@@ -1,4 +1,3 @@
-use super::*;
 use clap::{app_from_crate, Arg, SubCommand};
 
 #[derive(Debug, Clone)]
@@ -35,7 +34,7 @@ pub fn compile_arguments() -> Option<Options> {
             Mode::Hashing(Hashing { hash })
         }
         _ => {
-            error!("Please provide a valid operation.");
+            crate::error!("Please provide a valid operation.");
             return None;
         }
     };
