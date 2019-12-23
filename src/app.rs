@@ -1,4 +1,5 @@
-use clap::{app_from_crate, App, Arg};
+use super::*;
+use clap::{app_from_crate, Arg, SubCommand};
 
 #[derive(Debug, Clone)]
 pub struct Options {
@@ -16,13 +17,13 @@ pub struct Hashing {
     pub hash: String,
 }
 
-pub fn compile_arguments() -> Options {
+pub fn compile_arguments() -> Option<Options> {
     let matches = app_from_crate!()
         .arg(Arg::from_usage(
             "-i, --input=[FILE] 'Sets the input of the operation.'",
         ))
         .subcommand(
-            App::new("hash")
+            SubCommand::with_name("hash")
                 .about("Peforms hash operations.")
                 .arg(Arg::from_usage("<hash> 'Sets the hash algorithm to use'")),
         )
@@ -33,11 +34,14 @@ pub fn compile_arguments() -> Options {
             let hash = sub.value_of("hash").map(|s| s.to_owned()).unwrap();
             Mode::Hashing(Hashing { hash })
         }
-        _ => unreachable!(),
+        _ => {
+            error!("Please provide a valid operation.");
+            return None;
+        }
     };
 
-    Options {
+    Some(Options {
         input: matches.value_of("input").map(|s| s.to_owned()),
         subcommand,
-    }
+    })
 }

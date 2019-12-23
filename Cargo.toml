@@ -11,6 +11,16 @@ repository = "https://github.com/Stupremee/krypt"
 
 [dependencies]
 ansi_term = "0.12.1"
+hex = "0.4.0"
+digest = "0.8.1"
+blake2 = "0.8.1"
+md2 = "0.8.0"
+md4 = "0.8.0"
+md-5 = "0.8.0"
+sha-1 = "0.8.1"
+sha2 = "0.8.0"
+sha3 = "0.8.2"
+streebog = "0.8.0"
 
 [dependencies.clap]
 version = "2.33.0"
