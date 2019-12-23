@@ -4,6 +4,7 @@ extern crate ansi_term;
 extern crate hex;
 
 mod app;
+mod encode;
 mod hash;
 mod log;
 
