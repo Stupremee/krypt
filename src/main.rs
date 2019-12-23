@@ -39,9 +39,7 @@ fn execute_hash(h: app::Hashing, data: Vec<u8>) {
     if let Some(hasher) = hasher {
         let result = hasher.hash(data);
         if h.raw_output {
-            std::io::stdout()
-                .write_all(result.as_slice())
-                .expect("Failed to write to stdout.");
+            print_bytes(result);
         } else {
             println!("{}", hex::encode(result));
         }
@@ -66,11 +64,11 @@ fn execute_encode(e: app::Encode, data: Vec<u8>) {
                 error!("Failed to decode input data. {}", err);
                 return;
             } else {
-                let result = result.unwrap();
-                std::io::stdout()
-                    .write_all(result.as_slice())
-                    .expect("Failed to write to stdout.");
+                print_bytes(result.unwrap());
             }
+        } else {
+            let result = encoder.encode(data);
+            println!("{}", result);
         }
     } else {
         error!(
@@ -82,6 +80,12 @@ fn execute_encode(e: app::Encode, data: Vec<u8>) {
                 .join(", ")
         );
     }
+}
+
+fn print_bytes(bytes: Vec<u8>) {
+    std::io::stdout()
+        .write_all(bytes.as_slice())
+        .expect("Failed to write to stdout.");
 }
 
 fn get_input(options: &Options) -> Result<Vec<u8>, std::io::Error> {
