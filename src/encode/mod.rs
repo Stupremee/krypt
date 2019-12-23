@@ -1,7 +1,7 @@
 use data_encoding::{DecodeError, Encoding};
 
 pub(crate) const ENCODINGS: [(&str, &dyn Encoder); 5] = [
-    ("base16", &GenericEncoder::new(data_encoding::HEXUPPER)),
+    ("hex", &GenericEncoder::new(data_encoding::HEXUPPER)),
     ("base32", &GenericEncoder::new(data_encoding::BASE32)),
     ("base32hex", &GenericEncoder::new(data_encoding::BASE32HEX)),
     ("base64", &GenericEncoder::new(data_encoding::BASE64)),
@@ -10,7 +10,7 @@ pub(crate) const ENCODINGS: [(&str, &dyn Encoder); 5] = [
 
 pub trait Encoder {
     fn encode(&self, data: Vec<u8>) -> String;
-    fn decode(&self, data: String) -> Result<Vec<u8>, DecodeError>;
+    fn decode(&self, data: Vec<u8>) -> Result<Vec<u8>, DecodeError>;
 }
 
 pub struct GenericEncoder {
@@ -28,8 +28,8 @@ impl Encoder for GenericEncoder {
         self.encoding.encode(data.as_slice())
     }
 
-    fn decode(&self, data: String) -> Result<Vec<u8>, DecodeError> {
-        self.encoding.decode(data.as_bytes())
+    fn decode(&self, data: Vec<u8>) -> Result<Vec<u8>, DecodeError> {
+        self.encoding.decode(data.as_slice())
     }
 }
 

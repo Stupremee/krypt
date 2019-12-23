@@ -30,7 +30,7 @@ fn main() {
 
     match options.subcommand {
         Mode::Hashing(hash) => execute_hash(hash, input),
-        _ => unreachable!(),
+        Mode::Encode(encode) => execute_encode(encode, input),
     };
 }
 
@@ -49,6 +49,33 @@ fn execute_hash(h: app::Hashing, data: Vec<u8>) {
         error!(
             "Invalid hash algorithm provided. Valid algorithms are: {}",
             crate::hash::ALGORITHMS
+                .iter()
+                .map(|s| s.0)
+                .collect::<Vec<&str>>()
+                .join(", ")
+        );
+    }
+}
+
+fn execute_encode(e: app::Encode, data: Vec<u8>) {
+    let encoder = encode::find_encoder_for_name(e.base.as_str());
+    if let Some(encoder) = encoder {
+        if e.decode {
+            let result = encoder.decode(data);
+            if let Err(err) = result {
+                error!("Failed to decode input data. {}", err);
+                return;
+            } else {
+                let result = result.unwrap();
+                std::io::stdout()
+                    .write_all(result.as_slice())
+                    .expect("Failed to write to stdout.");
+            }
+        }
+    } else {
+        error!(
+            "Invalid base provided. Valid bases are: {}",
+            crate::encode::ENCODINGS
                 .iter()
                 .map(|s| s.0)
                 .collect::<Vec<&str>>()

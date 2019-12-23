@@ -41,7 +41,9 @@ pub fn compile_arguments() -> Option<Options> {
             SubCommand::with_name("encode")
                 .about("Peforms data encoding and decoding.")
                 .arg(Arg::from_usage("-d, --decode 'Decode the input data.'"))
-                .arg(Arg::from_usage("<base> '16,hex,32,32hex,64,64url'")),
+                .arg(Arg::from_usage(
+                    "<base> 'hex,base32,base32hex,base64,base64url'",
+                )),
         )
         .get_matches();
 
