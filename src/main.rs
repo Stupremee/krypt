@@ -42,7 +42,14 @@ fn execute_hash(h: app::Hashing, data: Vec<u8>) -> Option<Vec<u8>> {
     if let Some(hasher) = hasher {
         Some(hasher.hash(data))
     } else {
-        error!("Invalid hash algorithm provided.");
+        error!(
+            "Invalid hash algorithm provided. Valid algorithms are: {}",
+            crate::hash::ALGORITHMS
+                .iter()
+                .map(|s| s.0)
+                .collect::<Vec<&str>>()
+                .join(", ")
+        );
         None
     }
 }
