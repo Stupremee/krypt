@@ -14,6 +14,7 @@ pub enum Mode {
 #[derive(Debug, Clone)]
 pub struct Hashing {
     pub hash: String,
+    pub raw_output: bool,
 }
 
 pub fn compile_arguments() -> Option<Options> {
@@ -24,6 +25,9 @@ pub fn compile_arguments() -> Option<Options> {
         .subcommand(
             SubCommand::with_name("hash")
                 .about("Peforms hash operations.")
+                .arg(Arg::from_usage(
+                    "-r, --raw 'Print the result as raw bytes.'",
+                ))
                 .arg(Arg::from_usage("<hash> 'Sets the hash algorithm to use'")),
         )
         .get_matches();
@@ -31,7 +35,8 @@ pub fn compile_arguments() -> Option<Options> {
     let subcommand = match matches.subcommand() {
         ("hash", Some(sub)) => {
             let hash = sub.value_of("hash").map(|s| s.to_owned()).unwrap();
-            Mode::Hashing(Hashing { hash })
+            let raw_output = sub.is_present("raw");
+            Mode::Hashing(Hashing { hash, raw_output })
         }
         _ => {
             crate::error!("Please provide a valid operation.");

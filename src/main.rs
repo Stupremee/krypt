@@ -27,20 +27,23 @@ fn main() {
         }
     };
 
-    let result = match options.subcommand {
+    match options.subcommand {
         Mode::Hashing(hash) => execute_hash(hash, input),
         _ => unreachable!(),
     };
-
-    if let Some(result) = result {
-        println!("{}", hex::encode(result));
-    }
 }
 
-fn execute_hash(h: app::Hashing, data: Vec<u8>) -> Option<Vec<u8>> {
+fn execute_hash(h: app::Hashing, data: Vec<u8>) {
     let hasher = hash::find_hash_for_name(h.hash.as_str());
     if let Some(hasher) = hasher {
-        Some(hasher.hash(data))
+        let result = hasher.hash(data);
+        if h.raw_output {
+            std::io::stdout()
+                .write_all(result.as_slice())
+                .expect("Failed to write to stdout.");
+        } else {
+            println!("{}", hex::encode(result));
+        }
     } else {
         error!(
             "Invalid hash algorithm provided. Valid algorithms are: {}",
@@ -50,7 +53,6 @@ fn execute_hash(h: app::Hashing, data: Vec<u8>) -> Option<Vec<u8>> {
                 .collect::<Vec<&str>>()
                 .join(", ")
         );
-        None
     }
 }
 
