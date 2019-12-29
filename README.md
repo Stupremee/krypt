@@ -6,27 +6,9 @@ Krypt is a swiss-army knife for encoding, decoding, encryption, decryption and h
 
 ### Hashing
 
-Supported hash algorithms:
-- blake2b
-- blake2s
-- md2
-- md4
-- md5
-- sha1
-- sha224
-- sha256
-- sha384
-- sha512
-- keccak224
-- keccak256
-- keccak384
-- keccak512
-- sha3_224
-- sha3_256
-- sha3_384
-- sha3_512
-- streebog256
-- streebog512
+**Supported hash algorithms:** blake2b, blake2s, md2, md4, md5,
+sha1, sha224, sha256, sha384, sha512, keccak224, keccak256,
+keccak384, keccak512, sha3_224, sha3_256, sha3_384, sha3_512, streebog256, streebog512
 
 ```sh
 # hash stdin via sha256
