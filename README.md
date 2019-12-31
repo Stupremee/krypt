@@ -1,6 +1,6 @@
 # Krypt
 
-Krypt is a swiss-army knife for encoding, decoding, encryption, decryption and hashing in the terminal.
+Krypt is a swiss-army knife for encoding, decoding, and hashing in the terminal.
 
 ## Usage
 
