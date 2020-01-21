@@ -1,14 +1,8 @@
-#[macro_use]
-extern crate clap;
-extern crate ansi_term;
-extern crate hex;
-
 mod app;
-mod encode;
-mod hash;
 mod log;
 
 use app::{Mode, Options};
+use krypt::{encode, hash};
 use std::fs::File;
 use std::io;
 use std::io::prelude::*;
@@ -46,7 +40,7 @@ fn execute_hash(h: app::Hashing, data: Vec<u8>) {
     } else {
         error!(
             "Invalid hash algorithm provided. Valid algorithms are: {}",
-            crate::hash::ALGORITHMS
+            hash::ALGORITHMS
                 .iter()
                 .map(|s| s.0)
                 .collect::<Vec<&str>>()
@@ -73,7 +67,7 @@ fn execute_encode(e: app::Encode, data: Vec<u8>) {
     } else {
         error!(
             "Invalid base provided. Valid bases are: {}",
-            crate::encode::ENCODINGS
+            encode::ENCODINGS
                 .iter()
                 .map(|s| s.0)
                 .collect::<Vec<&str>>()

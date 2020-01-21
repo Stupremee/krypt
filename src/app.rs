@@ -1,4 +1,6 @@
-use clap::{app_from_crate, Arg, SubCommand};
+use clap::{
+    app_from_crate, crate_authors, crate_description, crate_name, crate_version, Arg, SubCommand,
+};
 
 #[derive(Debug, Clone)]
 pub struct Options {

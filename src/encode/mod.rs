@@ -1,6 +1,6 @@
 use data_encoding::{DecodeError, Encoding};
 
-pub(crate) const ENCODINGS: [(&str, &dyn Encoder); 5] = [
+pub const ENCODINGS: [(&str, &dyn Encoder); 5] = [
     ("hex", &GenericEncoder::new(data_encoding::HEXLOWER)),
     ("base32", &GenericEncoder::new(data_encoding::BASE32)),
     ("base32hex", &GenericEncoder::new(data_encoding::BASE32HEX)),

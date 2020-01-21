@@ -1,6 +1,6 @@
 use digest::Digest;
 
-pub(crate) const ALGORITHMS: [(&str, &dyn HashAlgorithm); 20] = [
+pub const ALGORITHMS: [(&str, &dyn HashAlgorithm); 20] = [
     ("blake2b", &Blake2bHasher {}),
     ("blake2s", &Blake2sHasher {}),
     ("md2", &Md2Hasher {}),
