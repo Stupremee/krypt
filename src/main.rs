@@ -1,13 +1,14 @@
 mod app;
-mod log;
 
 use app::{Mode, Options};
 use krypt::{encode, hash};
+use log::*;
 use std::fs::File;
 use std::io;
 use std::io::prelude::*;
 
 fn main() {
+    pretty_env_logger::init();
     let options = app::compile_arguments();
     if options.is_none() {
         return;

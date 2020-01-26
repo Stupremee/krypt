@@ -30,6 +30,8 @@ sha2 = "0.8.1"
 sha3 = "0.8.2"
 streebog = "0.8.0"
 data-encoding = "2.1.2"
+log = "0.4.8"
+pretty_env_logger = "0.3.1"
 
 [dependencies.clap]
 version = "2.33.0"
