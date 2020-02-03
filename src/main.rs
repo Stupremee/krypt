@@ -1,7 +1,9 @@
 use clap::arg_enum;
-use krypt::encode::Encoding;
-use krypt::hash::{hash_with_algorithm, HashAlgorithm};
-use std::path::PathBuf;
+use krypt::{
+    encode::{self, Encoding},
+    hash::{self, HashAlgorithm},
+};
+use std::{fs::File, io::prelude::*, io::Read, path::PathBuf};
 use structopt::StructOpt;
 
 arg_enum! {
@@ -50,6 +52,61 @@ struct HashMode {
     algorithm: HashAlgorithm,
 }
 
+type Result<T> = std::result::Result<T, Box<dyn std::error::Error>>;
+
 fn main() {
-    let _m = Options::from_args();
+    if let Err(err) = try_main() {
+        if atty::is(atty::Stream::Stderr) {
+            eprintln!("{}", err);
+        }
+        std::process::exit(1);
+    }
+}
+
+fn try_main() -> Result<()> {
+    let opts = Options::from_args();
+
+    let mut file;
+    let mut stdin;
+    let input: &mut dyn Read = if let Some(path) = opts.input {
+        file = File::open(path)?;
+        &mut file
+    } else {
+        stdin = std::io::stdin();
+        &mut stdin
+    };
+    let data = read_data(input)?;
+    let result = match opts.mode {
+        Mode::Encode(e) => {
+            if e.decode {
+                encode::encode_data(e.base, data)
+            } else {
+                encode::decode_data(e.base, data)?
+            }
+        }
+        Mode::Hash(h) => hash::hash_with_algorithm(h.algorithm, data),
+    };
+
+    match opts.output_format {
+        OutputFormat::Hex => print_hex(result),
+        OutputFormat::Raw => print_bytes(result)?,
+        OutputFormat::HexDump => todo!("Implement hex dump output here"),
+    }
+
+    Ok(())
+}
+
+fn print_hex(data: Vec<u8>) {
+    println!("{}", hex::encode(data))
+}
+
+fn print_bytes(data: Vec<u8>) -> Result<()> {
+    std::io::stdout().write_all(data.as_slice())?;
+    Ok(())
+}
+
+fn read_data(read: &mut dyn Read) -> Result<Vec<u8>> {
+    let mut data = Vec::new();
+    read.read_to_end(&mut data)?;
+    Ok(data)
 }
