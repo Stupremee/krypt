@@ -1,75 +1,56 @@
 use digest::Digest;
 
-pub const ALGORITHMS: [(&str, &dyn HashAlgorithm); 20] = [
-    ("blake2b", &Blake2bHasher {}),
-    ("blake2s", &Blake2sHasher {}),
-    ("md2", &Md2Hasher {}),
-    ("md4", &Md4Hasher {}),
-    ("md5", &Md5Hasher {}),
-    ("sha1", &Sha1Hasher {}),
-    ("sha224", &Sha224Hasher {}),
-    ("sha256", &Sha256Hasher {}),
-    ("sha384", &Sha384Hasher {}),
-    ("sha512", &Sha512Hasher {}),
-    ("keccak224", &Keccak224Hasher {}),
-    ("keccak256", &Keccak256Hasher {}),
-    ("keccak384", &Keccak384Hasher {}),
-    ("keccak512", &Keccak512Hasher {}),
-    ("sha3_224", &Sha3_224Hasher {}),
-    ("sha3_256", &Sha3_256Hasher {}),
-    ("sha3_384", &Sha3_384Hasher {}),
-    ("sha3_512", &Sha3_512Hasher {}),
-    ("streebog256", &Streebog256Hasher {}),
-    ("streebog512", &Streebog512Hasher {}),
-];
-
-pub trait HashAlgorithm {
-    fn hash(&self, data: Vec<u8>) -> Vec<u8>;
-}
-
-macro_rules! generic_algorithm {
-    ($arg:path, $name:ident) => {
-        pub struct $name;
-        impl $crate::hash::HashAlgorithm for $name {
-            fn hash(&self, data: Vec<u8>) -> Vec<u8> {
-                generic_hash::<$arg>(data)
-            }
-        }
-    };
-}
-
-generic_algorithm!(blake2::Blake2b, Blake2bHasher);
-generic_algorithm!(blake2::Blake2s, Blake2sHasher);
-generic_algorithm!(md2::Md2, Md2Hasher);
-generic_algorithm!(md4::Md4, Md4Hasher);
-generic_algorithm!(md5::Md5, Md5Hasher);
-generic_algorithm!(sha1::Sha1, Sha1Hasher);
-generic_algorithm!(sha2::Sha224, Sha224Hasher);
-generic_algorithm!(sha2::Sha256, Sha256Hasher);
-generic_algorithm!(sha2::Sha384, Sha384Hasher);
-generic_algorithm!(sha2::Sha512, Sha512Hasher);
-generic_algorithm!(sha3::Keccak224, Keccak224Hasher);
-generic_algorithm!(sha3::Keccak256, Keccak256Hasher);
-generic_algorithm!(sha3::Keccak384, Keccak384Hasher);
-generic_algorithm!(sha3::Keccak512, Keccak512Hasher);
-generic_algorithm!(sha3::Sha3_224, Sha3_224Hasher);
-generic_algorithm!(sha3::Sha3_256, Sha3_256Hasher);
-generic_algorithm!(sha3::Sha3_384, Sha3_384Hasher);
-generic_algorithm!(sha3::Sha3_512, Sha3_512Hasher);
-generic_algorithm!(streebog::Streebog256, Streebog256Hasher);
-generic_algorithm!(streebog::Streebog512, Streebog512Hasher);
-
-fn generic_hash<D: Digest>(data: Vec<u8>) -> Vec<u8> {
+pub fn generic_hash<D: Digest>(data: Vec<u8>) -> Vec<u8> {
     let mut hasher = D::new();
     hasher.input(data);
     hasher.result().into_iter().collect::<Vec<u8>>()
 }
 
-pub fn find_hash_for_name(name: &str) -> Option<&dyn HashAlgorithm> {
-    for pair in ALGORITHMS.iter() {
-        if name.eq_ignore_ascii_case(pair.0) {
-            return Some(pair.1);
-        }
+pub fn hash_with_algorithm(alg: HashAlgorithm, data: Vec<u8>) -> Vec<u8> {
+    match alg {
+        HashAlgorithm::Blake3 => generic_hash::<blake3::Hasher>(data),
+        HashAlgorithm::Md2 => generic_hash::<md2::Md2>(data),
+        HashAlgorithm::Md4 => generic_hash::<md4::Md4>(data),
+        HashAlgorithm::Md5 => generic_hash::<md5::Md5>(data),
+        HashAlgorithm::Sha1 => generic_hash::<sha1::Sha1>(data),
+        HashAlgorithm::Sha224 => generic_hash::<sha2::Sha224>(data),
+        HashAlgorithm::Sha256 => generic_hash::<sha2::Sha256>(data),
+        HashAlgorithm::Sha384 => generic_hash::<sha2::Sha384>(data),
+        HashAlgorithm::Sha512 => generic_hash::<sha2::Sha512>(data),
+        HashAlgorithm::Keccak224 => generic_hash::<sha3::Keccak224>(data),
+        HashAlgorithm::Keccak256 => generic_hash::<sha3::Keccak256>(data),
+        HashAlgorithm::Keccak384 => generic_hash::<sha3::Keccak384>(data),
+        HashAlgorithm::Keccak512 => generic_hash::<sha3::Keccak512>(data),
+        HashAlgorithm::Sha3_224 => generic_hash::<sha3::Sha3_224>(data),
+        HashAlgorithm::Sha3_256 => generic_hash::<sha3::Sha3_256>(data),
+        HashAlgorithm::Sha3_384 => generic_hash::<sha3::Sha3_384>(data),
+        HashAlgorithm::Sha3_512 => generic_hash::<sha3::Sha3_512>(data),
+        HashAlgorithm::Streebog256 => generic_hash::<streebog::Streebog256>(data),
+        HashAlgorithm::Streebog512 => generic_hash::<streebog::Streebog512>(data),
     }
-    None
+}
+
+arg_enum! {
+    #[derive(Debug)]
+    pub enum HashAlgorithm {
+        Blake3,
+        Md2,
+        Md4,
+        Md5,
+        Sha1,
+        Sha224,
+        Sha256,
+        Sha384,
+        Sha512,
+        Keccak224,
+        Keccak256,
+        Keccak384,
+        Keccak512,
+        Sha3_224,
+        Sha3_256,
+        Sha3_384,
+        Sha3_512,
+        Streebog256,
+        Streebog512,
+    }
 }
