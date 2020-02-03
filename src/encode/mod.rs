@@ -1,43 +1,35 @@
-use data_encoding::{DecodeError, Encoding};
+use clap::arg_enum;
 
-pub const ENCODINGS: [(&str, &dyn Encoder); 5] = [
-    ("hex", &GenericEncoder::new(data_encoding::HEXLOWER)),
-    ("base32", &GenericEncoder::new(data_encoding::BASE32)),
-    ("base32hex", &GenericEncoder::new(data_encoding::BASE32HEX)),
-    ("base64", &GenericEncoder::new(data_encoding::BASE64)),
-    ("base64url", &GenericEncoder::new(data_encoding::BASE64URL)),
-];
-
-pub trait Encoder {
-    fn encode(&self, data: Vec<u8>) -> String;
-    fn decode(&self, data: Vec<u8>) -> Result<Vec<u8>, DecodeError>;
+pub fn encode_data(encoding: Encoding, data: Vec<u8>) -> Vec<u8> {
+    encoding.encoding().encode(data.as_slice()).into_bytes()
 }
 
-pub struct GenericEncoder {
+pub fn decode_data(
     encoding: Encoding,
+    data: Vec<u8>,
+) -> Result<Vec<u8>, data_encoding::DecodeError> {
+    encoding.encoding().decode(data.as_slice())
 }
 
-impl GenericEncoder {
-    pub const fn new(encoding: Encoding) -> Self {
-        Self { encoding }
+arg_enum! {
+    #[derive(Debug)]
+    pub enum Encoding {
+        Hex,
+        Base32,
+        Base32Hex,
+        Base64,
+        Base64Url,
     }
 }
 
-impl Encoder for GenericEncoder {
-    fn encode(&self, data: Vec<u8>) -> String {
-        self.encoding.encode(data.as_slice())
-    }
-
-    fn decode(&self, data: Vec<u8>) -> Result<Vec<u8>, DecodeError> {
-        self.encoding.decode(data.as_slice())
-    }
-}
-
-pub fn find_encoder_for_name(name: &str) -> Option<&dyn Encoder> {
-    for pair in ENCODINGS.iter() {
-        if name.eq_ignore_ascii_case(pair.0) {
-            return Some(pair.1);
+impl Encoding {
+    fn encoding(&self) -> data_encoding::Encoding {
+        match self {
+            Encoding::Hex => data_encoding::HEXUPPER,
+            Encoding::Base32 => data_encoding::BASE32,
+            Encoding::Base32Hex => data_encoding::BASE32HEX,
+            Encoding::Base64 => data_encoding::BASE64,
+            Encoding::Base64Url => data_encoding::BASE64URL,
         }
     }
-    None
 }

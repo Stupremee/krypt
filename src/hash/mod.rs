@@ -1,6 +1,32 @@
+use clap::arg_enum;
 use digest::Digest;
 
-pub fn generic_hash<D: Digest>(data: Vec<u8>) -> Vec<u8> {
+arg_enum! {
+    #[derive(Debug)]
+    pub enum HashAlgorithm {
+        Blake3,
+        Md2,
+        Md4,
+        Md5,
+        Sha1,
+        Sha224,
+        Sha256,
+        Sha384,
+        Sha512,
+        Keccak224,
+        Keccak256,
+        Keccak384,
+        Keccak512,
+        Sha3_224,
+        Sha3_256,
+        Sha3_384,
+        Sha3_512,
+        Streebog256,
+        Streebog512,
+    }
+}
+
+fn generic_hash<D: Digest>(data: Vec<u8>) -> Vec<u8> {
     let mut hasher = D::new();
     hasher.input(data);
     hasher.result().into_iter().collect::<Vec<u8>>()
@@ -27,30 +53,5 @@ pub fn hash_with_algorithm(alg: HashAlgorithm, data: Vec<u8>) -> Vec<u8> {
         HashAlgorithm::Sha3_512 => generic_hash::<sha3::Sha3_512>(data),
         HashAlgorithm::Streebog256 => generic_hash::<streebog::Streebog256>(data),
         HashAlgorithm::Streebog512 => generic_hash::<streebog::Streebog512>(data),
-    }
-}
-
-arg_enum! {
-    #[derive(Debug)]
-    pub enum HashAlgorithm {
-        Blake3,
-        Md2,
-        Md4,
-        Md5,
-        Sha1,
-        Sha224,
-        Sha256,
-        Sha384,
-        Sha512,
-        Keccak224,
-        Keccak256,
-        Keccak384,
-        Keccak512,
-        Sha3_224,
-        Sha3_256,
-        Sha3_384,
-        Sha3_512,
-        Streebog256,
-        Streebog512,
     }
 }
