@@ -90,7 +90,7 @@ fn try_main() -> Result<()> {
     match opts.output_format {
         OutputFormat::Hex => print_hex(result),
         OutputFormat::Raw => print_bytes(result)?,
-        OutputFormat::HexDump => todo!("Implement hex dump output here"),
+        OutputFormat::HexDump => print_hexdump(result)?,
     }
 
     Ok(())
@@ -103,6 +103,12 @@ fn print_hex(data: Vec<u8>) {
 fn print_bytes(data: Vec<u8>) -> Result<()> {
     std::io::stdout().write_all(data.as_slice())?;
     Ok(())
+}
+
+fn print_hexdump(data: Vec<u8>) -> Result<()> {
+    let mut writer = std::io::stdout();
+    let mut p = hexyl::Printer::new(&mut writer, true, hexyl::BorderStyle::Unicode, true);
+    p.print_all(data.as_slice(), None)
 }
 
 fn read_data(read: &mut dyn Read) -> Result<Vec<u8>> {
