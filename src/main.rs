@@ -1,100 +1,32 @@
-mod app;
+use clap::arg_enum;
+use std::path::PathBuf;
+use structopt::StructOpt;
 
-use app::{Mode, Options};
-use krypt::{encode, hash};
-use log::*;
-use std::fs::File;
-use std::io;
-use std::io::prelude::*;
+arg_enum! {
+    #[derive(Debug)]
+    enum OutputFormat {
+        Raw,
+        Hex,
+        HexDump,
+    }
+}
+
+#[derive(StructOpt, Debug)]
+enum Mode {}
+
+#[derive(StructOpt, Debug)]
+struct Options {
+    /// Input file. If no input file is provided krypt will read from stdin.
+    #[structopt(name = "FILE", parse(from_os_str))]
+    input: Option<PathBuf>,
+    /// Specifies the output format.
+    #[structopt(short = "f", long = "format", possible_values = &OutputFormat::variants(), default_value = "Raw", case_insensitive = true)]
+    output_format: OutputFormat,
+    /// Which operation should be executed.
+    #[structopt(subcommand)]
+    mode: Mode,
+}
 
 fn main() {
-    pretty_env_logger::init();
-    let options = app::compile_arguments();
-    if options.is_none() {
-        return;
-    }
-    let options = options.unwrap();
-
-    let input = match get_input(&options) {
-        Ok(i) => i,
-        Err(e) => {
-            error!("failed to read input: {}", e);
-            return;
-        }
-    };
-
-    match options.subcommand {
-        Mode::Hashing(hash) => execute_hash(hash, input),
-        Mode::Encode(encode) => execute_encode(encode, input),
-    };
-}
-
-fn execute_hash(h: app::Hashing, data: Vec<u8>) {
-    let hasher = hash::find_hash_for_name(h.hash.as_str());
-    if let Some(hasher) = hasher {
-        let result = hasher.hash(data);
-        if h.raw_output {
-            print_bytes(result);
-        } else {
-            print!("{}", hex::encode(result));
-        }
-    } else {
-        error!(
-            "Invalid hash algorithm provided. Valid algorithms are: {}",
-            hash::ALGORITHMS
-                .iter()
-                .map(|s| s.0)
-                .collect::<Vec<&str>>()
-                .join(", ")
-        );
-    }
-}
-
-fn execute_encode(e: app::Encode, data: Vec<u8>) {
-    let encoder = encode::find_encoder_for_name(e.base.as_str());
-    if let Some(encoder) = encoder {
-        if e.decode {
-            let result = encoder.decode(data);
-            if let Err(err) = result {
-                error!("Failed to decode input data. {}", err);
-                return;
-            } else {
-                print_bytes(result.unwrap());
-            }
-        } else {
-            let result = encoder.encode(data);
-            print!("{}", result);
-        }
-    } else {
-        error!(
-            "Invalid base provided. Valid bases are: {}",
-            encode::ENCODINGS
-                .iter()
-                .map(|s| s.0)
-                .collect::<Vec<&str>>()
-                .join(", ")
-        );
-    }
-}
-
-fn print_bytes(bytes: Vec<u8>) {
-    std::io::stdout()
-        .write_all(bytes.as_slice())
-        .expect("Failed to write to stdout.");
-}
-
-fn get_input(options: &Options) -> Result<Vec<u8>, std::io::Error> {
-    match &options.input {
-        Some(inp) => {
-            let mut file = File::open(inp)?;
-            let mut contents = Vec::new();
-            file.read_to_end(&mut contents)?;
-            Ok(contents)
-        }
-        None => {
-            let mut contents = Vec::new();
-            io::stdin().read_to_end(&mut contents)?;
-            Ok(contents)
-        }
-    }
+    let _m = Options::from_args();
 }
