@@ -1,4 +1,6 @@
 use clap::arg_enum;
+use krypt::encode::Encoding;
+use krypt::hash::{hash_with_algorithm, HashAlgorithm};
 use std::path::PathBuf;
 use structopt::StructOpt;
 
@@ -12,7 +14,12 @@ arg_enum! {
 }
 
 #[derive(StructOpt, Debug)]
-enum Mode {}
+enum Mode {
+    /// Hashes the input value
+    Hash(HashMode),
+    /// Encode or decode the input data
+    Encode(EncodeMode),
+}
 
 #[derive(StructOpt, Debug)]
 struct Options {
@@ -25,6 +32,22 @@ struct Options {
     /// Which operation should be executed.
     #[structopt(subcommand)]
     mode: Mode,
+}
+
+#[derive(StructOpt, Debug)]
+struct EncodeMode {
+    /// Sepcifies the enoding base to use.
+    #[structopt(name = "BASE", possible_values = &Encoding::variants(), case_insensitive = true)]
+    base: Encoding,
+    /// If this option is present the input data will be decoded.
+    #[structopt(short = "d", long = "decode")]
+    decode: bool,
+}
+
+#[derive(StructOpt, Debug)]
+struct HashMode {
+    #[structopt(name = "ALGORITHM", possible_values = &HashAlgorithm::variants(), case_insensitive = true)]
+    algorithm: HashAlgorithm,
 }
 
 fn main() {
