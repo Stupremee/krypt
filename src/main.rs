@@ -1,4 +1,4 @@
-use clap::arg_enum;
+use clap::{arg_enum, Shell};
 use krypt::{
     encode::{self, Encoding},
     hash::{self, HashAlgorithm},
@@ -21,6 +21,8 @@ enum Mode {
     Hash(HashMode),
     /// Encode or decode the input data
     Encode(EncodeMode),
+    /// Generate completion scripts for various shells
+    Completions(CompletionsMode),
 }
 
 #[derive(StructOpt, Debug)]
@@ -34,6 +36,12 @@ struct Options {
     /// Which operation should be executed.
     #[structopt(subcommand)]
     mode: Mode,
+}
+
+#[derive(StructOpt, Debug)]
+struct CompletionsMode {
+    #[structopt(name = "SHELL", possible_values = &Shell::variants(), case_insensitive = true)]
+    shell: Shell,
 }
 
 #[derive(StructOpt, Debug)]
@@ -65,6 +73,13 @@ fn main() {
 
 fn try_main() -> Result<()> {
     let opts = Options::from_args();
+    match opts.mode {
+        Mode::Completions(c) => {
+            output_completions_scripts(c.shell);
+            std::process::exit(0);
+        }
+        _ => {}
+    };
 
     let mut file;
     let mut stdin;
@@ -85,6 +100,7 @@ fn try_main() -> Result<()> {
             }
         }
         Mode::Hash(h) => hash::hash_with_algorithm(h.algorithm, data),
+        Mode::Completions(_) => unreachable!(),
     };
 
     match opts.output_format {
@@ -115,4 +131,10 @@ fn read_data(read: &mut dyn Read) -> Result<Vec<u8>> {
     let mut data = Vec::new();
     read.read_to_end(&mut data)?;
     Ok(data)
+}
+
+fn output_completions_scripts(shell: Shell) {
+    let mut app = Options::clap();
+    let mut writer = std::io::stdout();
+    app.gen_completions_to("krypt", shell, &mut writer);
 }
