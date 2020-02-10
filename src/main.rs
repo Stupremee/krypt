@@ -28,7 +28,7 @@ enum Mode {
 #[derive(StructOpt, Debug)]
 struct Options {
     /// Input file. If no input file is provided krypt will read from stdin.
-    #[structopt(name = "FILE", parse(from_os_str))]
+    #[structopt(name = "FILE", short = "i", long = "input", parse(from_os_str))]
     input: Option<PathBuf>,
     /// Specifies the output format.
     #[structopt(short = "f", long = "format", possible_values = &OutputFormat::variants(), default_value = "Raw", case_insensitive = true)]
