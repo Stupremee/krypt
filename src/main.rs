@@ -30,6 +30,9 @@ struct Options {
     /// Input file. If no input file is provided krypt will read from stdin.
     #[structopt(name = "FILE", short = "i", long = "input", parse(from_os_str))]
     input: Option<PathBuf>,
+    /// Specifies if the input is hex encoded.
+    #[structopt(long = "hex-input")]
+    hex_input: bool,
     /// Specifies the output format.
     #[structopt(short = "f", long = "format", possible_values = &OutputFormat::variants(), default_value = "Raw", case_insensitive = true)]
     output_format: OutputFormat,
@@ -90,13 +93,20 @@ fn try_main() -> Result<()> {
         stdin = std::io::stdin();
         &mut stdin
     };
-    let data = read_data(input)?;
+    let mut data = if opts.hex_input {
+        read_hex_data(input)?
+    } else {
+        read_data(input)?
+    };
     let result = match opts.mode {
         Mode::Encode(e) => {
             if e.decode {
-                encode::encode_data(e.base, data)
-            } else {
+                if data.last().map_or(false, |e| e == &0x0au8) {
+                    data.pop();
+                }
                 encode::decode_data(e.base, data)?
+            } else {
+                encode::encode_data(e.base, data)
             }
         }
         Mode::Hash(h) => hash::hash_with_algorithm(h.algorithm, data),
@@ -117,8 +127,9 @@ fn print_hex(data: Vec<u8>) {
 }
 
 fn print_bytes(data: Vec<u8>) -> Result<()> {
-    std::io::stdout().write_all(data.as_slice())?;
-    Ok(())
+    std::io::stdout()
+        .write_all(data.as_slice())
+        .map_err(|e| e.into())
 }
 
 fn print_hexdump(data: Vec<u8>) -> Result<()> {
@@ -131,6 +142,18 @@ fn read_data(read: &mut dyn Read) -> Result<Vec<u8>> {
     let mut data = Vec::new();
     read.read_to_end(&mut data)?;
     Ok(data)
+}
+
+fn read_hex_data(read: &mut dyn Read) -> Result<Vec<u8>> {
+    let mut data = read_data(read)?;
+    if data.starts_with(&['0' as u8, 'x' as u8]) {
+        data.remove(0);
+        data.remove(0);
+    }
+    if data.last().map_or(false, |e| e == &0x0au8) {
+        data.pop();
+    }
+    hex::decode(data).map_err(|e| e.into())
 }
 
 fn output_completions_scripts(shell: Shell) {
