@@ -84,6 +84,7 @@ fn try_main() -> Result<()> {
         _ => {}
     };
 
+    dbg!();
     let mut file;
     let mut stdin;
     let input: &mut dyn Read = if let Some(path) = opts.input {
@@ -93,17 +94,20 @@ fn try_main() -> Result<()> {
         stdin = std::io::stdin();
         &mut stdin
     };
+    dbg!();
     let mut data = if opts.hex_input {
         read_hex_data(input)?
     } else {
         read_data(input)?
     };
+    dbg!();
     let result = match opts.mode {
         Mode::Encode(e) => {
             if e.decode {
                 if data.last().map_or(false, |e| e == &0x0au8) {
                     data.pop();
                 }
+                dbg!();
                 encode::decode_data(e.base, data)?
             } else {
                 encode::encode_data(e.base, data)
