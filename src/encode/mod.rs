@@ -3,11 +3,12 @@ use clap::arg_enum;
 pub fn encode_data(encoding: Encoding, mut data: Vec<u8>) -> Vec<u8> {
     match encoding {
         Encoding::Hex => {
-            if data.starts_with(['0' as u8, 'x' as u8]) {
+            if data.starts_with(&['0' as u8, 'x' as u8]) {
                 data.remove(0);
                 data.remove(0);
             }
         }
+        _ => {}
     }
 
     encoding.encoding().encode(data.as_slice()).into_bytes()
