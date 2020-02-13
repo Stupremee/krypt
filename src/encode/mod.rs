@@ -25,7 +25,7 @@ arg_enum! {
 impl Encoding {
     fn encoding(&self) -> data_encoding::Encoding {
         match self {
-            Encoding::Hex => data_encoding::HEXUPPER,
+            Encoding::Hex => data_encoding::HEXUPPER_PERMISSIVE,
             Encoding::Base32 => data_encoding::BASE32,
             Encoding::Base32Hex => data_encoding::BASE32HEX,
             Encoding::Base64 => data_encoding::BASE64,
