@@ -2,6 +2,12 @@
 
 Krypt is a swiss-army knife for encoding, decoding, and hashing in the terminal.
 
+## Installation
+
+```
+cargo install krypt
+```
+
 ## Usage
 
 ### Hashing
@@ -25,6 +31,9 @@ $ echo -n "hello world" | krypt -f hexdump hash sha256
 $ echo -n "hello world" > your_file
 $ krypt -i your_file -f hex hash sha256
 > b94d27b9934d3e08a52e52d7da7dabfac484efe37a5380ee9088f7ace2efcde9
+# hash raw bytes
+$ echo -n "\xff" | krypt -f hex hash sha256
+> a8100ae6aa1940d0b663bb31cd466142ebbdbd5187131b92d93818987832eb89
 # use hex encoded data as input
 $ echo "0xff" | krypt --hex-input -f hex hash sha256
 > a8100ae6aa1940d0b663bb31cd466142ebbdbd5187131b92d93818987832eb89
@@ -33,3 +42,22 @@ $ echo "0xff" > your_file
 $ krypt --hex-input -i your_file -f hex hash sha256
 > a8100ae6aa1940d0b663bb31cd466142ebbdbd5187131b92d93818987832eb89
 ```
+
+### Encoding
+
+```sh
+# encode string to bsae64
+$ echo "hello!" | krypt encode base64
+> aGVsbG8hCg==
+# decode data
+$ echo "aGVsbG8hCg==" | krypt encode -d base64
+> hello!
+# encode raw bytes (the 0A is the newline character)
+$ echo "\xaa\xbb\xcc" > foo
+$ krypt -i foo encode hex
+> AABBCC0A
+```
+
+## License
+
+This project is licensed under the [GPLv3](https://github.com/Stupremee/krypt/blob/master/LICENSE) license.
