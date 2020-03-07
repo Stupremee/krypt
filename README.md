@@ -4,8 +4,25 @@ Krypt is a swiss-army knife for encoding, decoding, and hashing in the terminal.
 
 ## Installation
 
+### Using cargo
+
 ```
 cargo install krypt
+```
+
+### Building from source
+
+**Requirements:**
+  - Rust (1.41 stable)
+  - cargo
+
+```
+git clone git@github.com:Stupremee/krypt
+cd krypt
+# Just build the binary
+cargo build --release
+# Install krypt
+cargo install --path .
 ```
 
 ## Usage
