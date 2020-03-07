@@ -1,6 +1,6 @@
 [package]
 name = "krypt"
-version = "0.1.0"
+version = "0.1.1-alpha.0"
 authors = ["Justus K. <justus.k@protonmail.com>"]
 edition = "2018"
 license = "GPL-3.0-only"
