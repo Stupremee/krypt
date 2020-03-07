@@ -1,5 +1,7 @@
 # Krypt
 
+![Crates.io](https://img.shields.io/crates/v/krypt)
+
 Krypt is a swiss-army knife for encoding, decoding, and hashing in the terminal.
 
 ## Installation
