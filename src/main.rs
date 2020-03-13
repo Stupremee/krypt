@@ -111,7 +111,7 @@ fn try_main() -> Result<()> {
                 encode::encode_data(e.base, data)
             }
         }
-        Mode::Hash(h) => hash::hash_with_algorithm(h.algorithm, data),
+        Mode::Hash(h) => hash::hash_with_algorithm(h.algorithm, &mut data)?,
         Mode::Completions(_) => unreachable!(),
     };
 

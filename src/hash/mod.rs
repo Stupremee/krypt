@@ -1,7 +1,8 @@
 use crate::input::ChunkRead;
+use crate::input::CHUNK_SIZE;
 use clap::arg_enum;
 use digest::Digest;
-use std::io::Read;
+use std::io::{Read, Result};
 
 arg_enum! {
     #[derive(Debug)]
@@ -28,16 +29,15 @@ arg_enum! {
     }
 }
 
-fn generic_hash<D: Digest, R: Read>(data: ChunkRead<R>) -> Vec<u8> {
+fn generic_hash<D: Digest, R: Read>(data: &mut ChunkRead<R>) -> Result<Vec<u8>> {
     let mut hasher = D::new();
-    let mut item = data.next();
-    while let Some(item) = item {
-        hasher.input(item);
+    while let Some(chunk) = data.next() {
+        hasher.input(chunk?);
     }
-    hasher.result().into_iter().collect::<Vec<u8>>()
+    Ok(hasher.result().into_iter().collect::<Vec<u8>>())
 }
 
-pub fn hash_with_algorithm<R: Read>(alg: HashAlgorithm, data: ChunkRead<R>) -> Vec<u8> {
+pub fn hash_with_algorithm<R: Read>(alg: HashAlgorithm, data: &mut ChunkRead<R>) -> Result<Vec<u8>> {
     match alg {
         HashAlgorithm::Blake3 => generic_hash::<blake3::Hasher, R>(data),
         HashAlgorithm::Md2 => generic_hash::<md2::Md2, R>(data),

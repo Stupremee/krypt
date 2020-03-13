@@ -1,6 +1,6 @@
 use std::io::{self, prelude::*};
 
-const CHUNK_SIZE: usize = 0x2000;
+pub const CHUNK_SIZE: usize = 0x2000;
 
 pub struct ChunkRead<R> {
     read: R,
@@ -22,31 +22,25 @@ impl<R> Iterator for ChunkRead<R>
 where
     R: Read,
 {
-    type Item = io::Result<u8>;
+    type Item = io::Result<Vec<u8>>;
 
     fn next(&mut self) -> Option<Self::Item> {
-        let byte = self.chunk.get(self.idx);
-        if let Some(byte) = byte {
-            self.idx += 1;
-            return Some(Ok(*byte));
-        }
+        let mut chunk = Vec::with_capacity(CHUNK_SIZE);
 
-        self.chunk.clear();
         match self
             .read
             .by_ref()
             .take(CHUNK_SIZE as u64)
-            .read_to_end(&mut self.chunk)
+            .read_to_end(&mut chunk)
         {
             Ok(n) => {
-                if n > 0 {
-                    self.idx = 0;
-                    self.next()
-                } else {
-                    None
+                if n == 0 {
+                    return None
                 }
             }
-            Err(e) => Some(Err(e)),
-        }
+            Err(e) => return Some(Err(e)),
+        };
+        std::mem::swap(&mut chunk, &mut self.chunk);
+        Some(Ok(chunk))
     }
 }
