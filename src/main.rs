@@ -2,6 +2,7 @@ use clap::{arg_enum, Shell};
 use krypt::{
     encode::{self, Encoding},
     hash::{self, HashAlgorithm},
+    input::ChunkRead,
 };
 use std::{fs::File, io::prelude::*, io::Read, path::PathBuf};
 use structopt::StructOpt;
@@ -94,16 +95,17 @@ fn try_main() -> Result<()> {
         &mut stdin
     };
     let mut data = if opts.hex_input {
-        read_hex_data(input)?
+        todo!("implement hex data with the new api")
     } else {
-        read_data(input)?
+        ChunkRead::new(input)
     };
+
     let result = match opts.mode {
         Mode::Encode(e) => {
             if e.decode {
-                if data.last().map_or(false, |e| e == &0x0au8) {
-                    data.pop();
-                }
+                /* if data.last().map_or(false, |e| e == &0x0au8) {
+                 *     data.pop();
+                 * } */
                 encode::decode_data(e.base, data)?
             } else {
                 encode::encode_data(e.base, data)
@@ -138,23 +140,17 @@ fn print_hexdump(data: Vec<u8>) -> Result<()> {
     p.print_all(data.as_slice(), None)
 }
 
-fn read_data(read: &mut dyn Read) -> Result<Vec<u8>> {
-    let mut data = Vec::new();
-    read.read_to_end(&mut data)?;
-    Ok(data)
-}
-
-fn read_hex_data(read: &mut dyn Read) -> Result<Vec<u8>> {
-    let mut data = read_data(read)?;
-    if data.starts_with(&['0' as u8, 'x' as u8]) {
-        data.remove(0);
-        data.remove(0);
-    }
-    if data.last().map_or(false, |e| e == &0x0au8) {
-        data.pop();
-    }
-    hex::decode(data).map_err(|e| e.into())
-}
+/* fn read_hex_data(read: &mut dyn Read) -> Result<Vec<u8>> {
+ *     let mut data = read_data(read)?;
+ *     if data.starts_with(&['0' as u8, 'x' as u8]) {
+ *         data.remove(0);
+ *         data.remove(0);
+ *     }
+ *     if data.last().map_or(false, |e| e == &0x0au8) {
+ *         data.pop();
+ *     }
+ *     hex::decode(data).map_err(|e| e.into())
+ * } */
 
 fn output_completions_scripts(shell: Shell) {
     let mut app = Options::clap();

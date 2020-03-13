@@ -1,4 +1,3 @@
 pub mod encode;
 pub mod hash;
-
-pub enum KryptError {}
+pub mod input;
