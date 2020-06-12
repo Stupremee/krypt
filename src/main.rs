@@ -2,6 +2,7 @@
 
 mod app;
 mod log;
+mod write;
 
 use app::{HashMode, Mode, Options, OutputFormat};
 use krypt::chunk::ChunkRead;
@@ -36,14 +37,21 @@ fn try_main() -> Result<()> {
     let input = get_input(opt.input)?;
     let output = get_output(opt.output)?;
 
+    let format = match opt.output_format {
+        Some(f) => f,
+        None => match opt.mode {
+            Mode::Hash(_) => OutputFormat::Hex,
+        },
+    };
+    let output = Box::new(write::FormatWriter::new(output, format));
+
     let res = match opt.mode {
-        Mode::Hash(mode) => hash_data(opt.output_format, mode, input, output),
+        Mode::Hash(mode) => hash_data(mode, input, output),
     };
     res
 }
 
 fn hash_data(
-    format: Option<OutputFormat>,
     mode: HashMode,
     input: ChunkRead<Box<dyn Read>>,
     output: Box<dyn Write>,

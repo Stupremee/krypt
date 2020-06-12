@@ -1,9 +1,9 @@
 //! Contains all stuff that is required for the Hash mode operations.
 #![allow(missing_docs)]
 
-use crate::chunk::{ChunkRead, CHUNK_SIZE};
-use digest::{generic_array::GenericArray, Digest};
-use std::io::Read;
+use crate::{chunk::ChunkRead, Result};
+use digest::Digest;
+use std::io::{Read, Write};
 use structopt::clap::arg_enum;
 
 arg_enum! {
@@ -49,9 +49,53 @@ arg_enum! {
     }
 }
 
-fn generic_hash<D: Digest, R: Read>(
+fn generic_hash<D: Digest, R: Read, W: Write>(
     data: &mut ChunkRead<R>,
-) -> Result<GenericArray<u8, D::OutputSize>, Box<dyn std::error::Error>> {
+    output: &mut W,
+) -> Result<()> {
     let mut hasher = D::new();
-    Ok(hasher.finalize())
+
+    while let Some(chunk) = data.next() {
+        hasher.update(chunk?);
+    }
+
+    let result = hasher.finalize();
+    std::io::copy(&mut result.as_slice(), output)?;
+    Ok(())
+}
+
+pub fn hash_with_algorithm<R: Read, W: Write>(
+    alg: HashAlgorithm,
+    data: &mut ChunkRead<R>,
+    output: &mut W,
+) -> Result<()> {
+    match alg {
+        HashAlgorithm::Blake2b => generic_hash::<blake2::Blake2b, R, W>(data, output),
+        HashAlgorithm::Blake2s => generic_hash::<blake2::Blake2s, R, W>(data, output),
+        HashAlgorithm::Blake3 => generic_hash::<blake3::Hasher, R, W>(data, output),
+        HashAlgorithm::Md2 => generic_hash::<md2::Md2, R, W>(data, output),
+        HashAlgorithm::Md4 => generic_hash::<md4::Md4, R, W>(data, output),
+        HashAlgorithm::Md5 => generic_hash::<md5::Md5, R, W>(data, output),
+        HashAlgorithm::Sha1 => generic_hash::<sha1::Sha1, R, W>(data, output),
+        HashAlgorithm::Sha224 => generic_hash::<sha2::Sha224, R, W>(data, output),
+        HashAlgorithm::Sha256 => generic_hash::<sha2::Sha256, R, W>(data, output),
+        HashAlgorithm::Sha384 => generic_hash::<sha2::Sha384, R, W>(data, output),
+        HashAlgorithm::Sha512 => generic_hash::<sha2::Sha512, R, W>(data, output),
+        HashAlgorithm::Sha3_224 => generic_hash::<sha3::Sha3_224, R, W>(data, output),
+        HashAlgorithm::Sha3_256 => generic_hash::<sha3::Sha3_256, R, W>(data, output),
+        HashAlgorithm::Sha3_384 => generic_hash::<sha3::Sha3_384, R, W>(data, output),
+        HashAlgorithm::Sha3_512 => generic_hash::<sha3::Sha3_512, R, W>(data, output),
+        HashAlgorithm::Keccak224 => generic_hash::<sha3::Keccak224, R, W>(data, output),
+        HashAlgorithm::Keccak256 => generic_hash::<sha3::Keccak256, R, W>(data, output),
+        HashAlgorithm::Keccak384 => generic_hash::<sha3::Keccak384, R, W>(data, output),
+        HashAlgorithm::Keccak512 => generic_hash::<sha3::Keccak512, R, W>(data, output),
+        HashAlgorithm::Shabal192 => generic_hash::<shabal::Shabal192, R, W>(data, output),
+        HashAlgorithm::Shabal224 => generic_hash::<shabal::Shabal224, R, W>(data, output),
+        HashAlgorithm::Shabal256 => generic_hash::<shabal::Shabal256, R, W>(data, output),
+        HashAlgorithm::Shabal384 => generic_hash::<shabal::Shabal384, R, W>(data, output),
+        HashAlgorithm::Shabal512 => generic_hash::<shabal::Shabal512, R, W>(data, output),
+        HashAlgorithm::Streebog256 => generic_hash::<streebog::Streebog256, R, W>(data, output),
+        HashAlgorithm::Streebog512 => generic_hash::<streebog::Streebog512, R, W>(data, output),
+        HashAlgorithm::Whirlpool => generic_hash::<whirlpool::Whirlpool, R, W>(data, output),
+    }
 }

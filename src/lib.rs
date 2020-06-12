@@ -6,3 +6,6 @@
 
 pub mod chunk;
 pub mod hash;
+
+/// Common Result type that will match all errors
+pub type Result<T> = std::result::Result<T, Box<dyn std::error::Error>>;

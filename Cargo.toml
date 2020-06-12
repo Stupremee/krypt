@@ -24,4 +24,19 @@ structopt = "0.3.14"
 color-backtrace = "0.4.2"
 belog = { version = "0.1.0", features = ["colored"] }
 termcolor = "1.1.0"
+hex = "0.4.2"
 digest = "0.9.0"
+
+# hash algorithms
+blake2 = "0.9.0"
+# we have to use my fork because there is the latest digest version
+blake3 = { git = "https://github.com/Stupremee/BLAKE3", branch = "bump-digest-crypto_mac" }
+md2 = "0.9.0"
+md4 = "0.9.0"
+md-5 = "0.9.0"
+sha2 = "0.9.0"
+sha3 = "0.9.0"
+shabal = "0.3.0"
+streebog = "0.9.0"
+whirlpool = "0.9.0"
+sha-1 = "0.9.0"
