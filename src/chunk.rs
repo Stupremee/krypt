@@ -66,27 +66,6 @@ impl<R: Read> Iterator for ChunkRead<R> {
     }
 }
 
-/// A trait that is implemented for all types that implement `Read`.
-pub trait IntoChunkRead {
-    /// Turns this `Read` into a [`ChunkRead`].
-    ///
-    /// The chunk size for the new `ChunkRead` will be the default chunk size.
-    ///
-    /// [`ChunkRead`]: ./struct.ChunkRead.html
-    fn into_chunk_read(self) -> ChunkRead<Self>
-    where
-        Self: Sized + Read;
-}
-
-impl<R: Read> IntoChunkRead for R {
-    fn into_chunk_read(self) -> ChunkRead<Self>
-    where
-        Self: Sized + Read,
-    {
-        ChunkRead::new(self)
-    }
-}
-
 #[cfg(test)]
 mod tests {
     use super::*;

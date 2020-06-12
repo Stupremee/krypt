@@ -16,7 +16,7 @@ pub struct Options {
     #[structopt(short, long, parse(from_os_str))]
     pub output: Option<PathBuf>,
 
-    /// The output format. [hex, raw]
+    /// The output format.
     ///
     /// The hex option will output a hex representation of the data.
     /// The raw option will output the raw bytes of the data.

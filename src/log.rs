@@ -4,8 +4,6 @@ use std::boxed::Box;
 use std::io::Write;
 use termcolor::{Color, ColorChoice, ColorSpec, StandardStream, WriteColor};
 
-static mut VERBOSE: u8 = 0;
-
 #[macro_export]
 macro_rules! ok {
     ($title:expr, $msg:expr) => {
