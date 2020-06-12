@@ -3,7 +3,7 @@
 mod app;
 mod log;
 
-use app::Options;
+use app::{HashMode, Mode, Options, OutputFormat};
 use krypt::chunk::ChunkRead;
 use std::{
     fs::File,
@@ -35,13 +35,19 @@ fn try_main() -> Result<()> {
     let opt = Options::from_args();
     let input = get_input(opt.input)?;
     let output = get_output(opt.output)?;
-    process_data(input, output)?;
 
-    Ok(())
+    let res = match opt.mode {
+        Mode::Hash(mode) => hash_data(opt.output_format, mode, input, output),
+    };
+    res
 }
 
-fn process_data(mut input: ChunkRead<Box<dyn Read>>, mut output: Box<dyn Write>) -> Result<()> {
-    io::copy(&mut input, &mut output)?;
+fn hash_data(
+    format: Option<OutputFormat>,
+    mode: HashMode,
+    input: ChunkRead<Box<dyn Read>>,
+    output: Box<dyn Write>,
+) -> Result<()> {
     Ok(())
 }
 

@@ -3,22 +3,19 @@
 //!
 //! [`Iterator`]: https://doc.rust-lang.org/stable/std/iter/trait.Iterator.html
 
-use std::{
-    collections::VecDeque,
-    io::{self, Read},
-};
+use std::io::{self, Read};
 
 /// The default size for a chunk of data.
 ///
-/// The default size is 8 MiB
-pub const CHUNK_SIZE: usize = 0x100000 * 8;
+/// The default size is 1 MiB
+pub const CHUNK_SIZE: usize = 0x100000;
 
 /// The implementation of a [`Iterator`] that will read data from [`Read`]
 /// using chunks.
 #[derive(Debug)]
 pub struct ChunkRead<R: Read> {
     read: R,
-    chunk: VecDeque<u8>,
+    chunk: Vec<u8>,
     chunk_size: usize,
 }
 
@@ -27,7 +24,7 @@ impl<R: Read> ChunkRead<R> {
     pub fn new(read: R) -> Self {
         Self {
             read,
-            chunk: VecDeque::with_capacity(CHUNK_SIZE),
+            chunk: Vec::with_capacity(CHUNK_SIZE),
             chunk_size: CHUNK_SIZE,
         }
     }
@@ -38,7 +35,7 @@ impl<R: Read> ChunkRead<R> {
         Self {
             read,
             chunk_size,
-            chunk: VecDeque::with_capacity(chunk_size),
+            chunk: Vec::with_capacity(chunk_size),
         }
     }
 
@@ -49,33 +46,24 @@ impl<R: Read> ChunkRead<R> {
 }
 
 impl<R: Read> Iterator for ChunkRead<R> {
-    type Item = io::Result<u8>;
+    type Item = io::Result<Vec<u8>>;
 
     fn next(&mut self) -> Option<Self::Item> {
-        if let Some(byte) = self.chunk.pop_front() {
-            Some(Ok(byte))
-        } else {
-            for byte in self.read.by_ref().bytes().take(CHUNK_SIZE) {
-                match byte {
-                    Ok(byte) => self.chunk.push_back(byte),
-                    Err(err) => return Some(Err(err)),
-                }
-            }
-            self.chunk.pop_front().map(|val| Ok(val))
-        }
-    }
-}
+        let mut chunk = Vec::with_capacity(CHUNK_SIZE);
 
-impl<R: Read> Read for ChunkRead<R> {
-    fn read(&mut self, buf: &mut [u8]) -> io::Result<usize> {
-        let len = buf.len();
-        let iter = Iterator::take(self, len).zip(0..len);
-        let mut read = 0;
-        for (byte, idx) in iter {
-            buf[idx] = byte?;
-            read += 1;
+        match self
+            .read
+            .by_ref()
+            .take(CHUNK_SIZE as u64)
+            .read_to_end(&mut chunk)
+        {
+            Ok(0) => return None,
+            Ok(_) => {}
+            Err(err) => return Some(Err(err)),
         }
-        Ok(read)
+
+        std::mem::swap(&mut chunk, &mut self.chunk);
+        Some(Ok(chunk))
     }
 }
 
@@ -91,7 +79,7 @@ mod tests {
 
         let read = read.collect::<Result<Vec<_>, io::Error>>();
         assert!(read.is_ok());
-        assert_eq!(data, read.unwrap());
+        assert_eq!(vec![data], read.unwrap());
     }
 
     #[test]

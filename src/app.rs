@@ -1,3 +1,4 @@
+use krypt::hash::HashAlgorithm;
 use std::path::PathBuf;
 use structopt::{clap::arg_enum, StructOpt};
 
@@ -20,8 +21,12 @@ pub struct Options {
     ///
     /// The hex option will output a hex representation of the data.
     /// The raw option will output the raw bytes of the data.
-    #[structopt(short = "f", long = "format", possible_values = &OutputFormat::variants(), default_value = "Raw", case_insensitive = true)]
-    pub output_format: OutputFormat,
+    #[structopt(short = "f", long = "format", possible_values = &OutputFormat::variants(), case_insensitive = true)]
+    pub output_format: Option<OutputFormat>,
+
+    /// The operation to execute. e.g. hash, encode, etc
+    #[structopt(subcommand)]
+    pub mode: Mode,
 }
 
 arg_enum! {
@@ -31,4 +36,19 @@ arg_enum! {
         Raw,
         Hex,
     }
+}
+
+/// The operation to execute. e.g. hash, encode, etc
+#[derive(Debug, StructOpt)]
+pub enum Mode {
+    /// Hashes the input data using a given algorithm.
+    Hash(HashMode),
+}
+
+/// Arguments that will be used for hashing data.
+#[derive(Debug, StructOpt)]
+pub struct HashMode {
+    /// The algorithm to use.
+    #[structopt(name = "ALGORITHM", possible_values = &HashAlgorithm::variants(), case_insensitive = true)]
+    algorithm: HashAlgorithm,
 }
