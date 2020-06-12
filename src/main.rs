@@ -35,9 +35,13 @@ fn try_main() -> Result<()> {
     let opt = Options::from_args();
     let input = get_input(opt.input)?;
     let output = get_output(opt.output)?;
+    process_data(input, output)?;
 
-    let data = todo!();
+    Ok(())
+}
 
+fn process_data(mut input: ChunkRead<Box<dyn Read>>, mut output: Box<dyn Write>) -> Result<()> {
+    io::copy(&mut input, &mut output)?;
     Ok(())
 }
 

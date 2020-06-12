@@ -66,6 +66,19 @@ impl<R: Read> Iterator for ChunkRead<R> {
     }
 }
 
+impl<R: Read> Read for ChunkRead<R> {
+    fn read(&mut self, buf: &mut [u8]) -> io::Result<usize> {
+        let len = buf.len();
+        let iter = Iterator::take(self, len).zip(0..len);
+        let mut read = 0;
+        for (byte, idx) in iter {
+            buf[idx] = byte?;
+            read += 1;
+        }
+        Ok(read)
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
