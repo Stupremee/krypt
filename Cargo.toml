@@ -1,6 +1,6 @@
 [package]
 name = "krypt"
-version = "0.1.1-alpha.0"
+version = "0.2.0-alpha.0"
 authors = ["Justus K. <justus.k@protonmail.com>"]
 edition = "2018"
 license = "GPL-3.0-only"
@@ -21,3 +21,4 @@ path = "src/main.rs"
 [dependencies]
 log = "0.4.8"
 loggerv = "0.7.2"
+structopt = "0.3.14"
