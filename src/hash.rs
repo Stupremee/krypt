@@ -1,42 +1,47 @@
 //! Contains all stuff that is required for the Hash mode operations.
+#![allow(missing_docs)]
 
-/// All hash algorithms that are supported by krypt.
-#[derive(Debug)]
-pub enum HashAlgorithm {
-    Blake2b,
-    Blake2s,
+use structopt::clap::arg_enum;
 
-    Blake3,
+arg_enum! {
+    /// All hash algorithms that are supported by krypt.
+    #[derive(Debug)]
+    pub enum HashAlgorithm {
+        Blake2b,
+        Blake2s,
 
-    Md2,
-    Md4,
-    Md5,
+        Blake3,
 
-    Sha1,
+        Md2,
+        Md4,
+        Md5,
 
-    Sha224,
-    Sha256,
-    Sha384,
-    Sha512,
+        Sha1,
 
-    Sha3_224,
-    Sha3_256,
-    Sha3_384,
-    Sha3_512,
+        Sha224,
+        Sha256,
+        Sha384,
+        Sha512,
 
-    Keccak224,
-    Keccak256,
-    Keccak384,
-    Keccak512,
+        Sha3_224,
+        Sha3_256,
+        Sha3_384,
+        Sha3_512,
 
-    Shabal192,
-    Shabal224,
-    Shabal256,
-    Shabal384,
-    Shabal512,
+        Keccak224,
+        Keccak256,
+        Keccak384,
+        Keccak512,
 
-    Streebog256,
-    Streebog512,
+        Shabal192,
+        Shabal224,
+        Shabal256,
+        Shabal384,
+        Shabal512,
 
-    Whirlpool,
+        Streebog256,
+        Streebog512,
+
+        Whirlpool,
+    }
 }
