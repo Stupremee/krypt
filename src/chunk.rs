@@ -54,7 +54,7 @@ impl<R: Read> Iterator for ChunkRead<R> {
         match self
             .read
             .by_ref()
-            .take(CHUNK_SIZE as u64)
+            .take(self.chunk_size as u64)
             .read_to_end(&mut chunk)
         {
             Ok(0) => return None,
@@ -62,7 +62,9 @@ impl<R: Read> Iterator for ChunkRead<R> {
             Err(err) => return Some(Err(err)),
         }
 
-        std::mem::swap(&mut chunk, &mut self.chunk);
+        if !self.chunk.is_empty() {
+            std::mem::swap(&mut chunk, &mut self.chunk);
+        }
         Some(Ok(chunk))
     }
 }
@@ -77,9 +79,9 @@ mod tests {
         let data = vec![12u8, 13, 14, 15, 16, 17, 18, 19, 20];
         let read = ChunkRead::new(Cursor::new(data.clone()));
 
-        let read = read.collect::<Result<Vec<_>, io::Error>>();
-        assert!(read.is_ok());
-        assert_eq!(vec![data], read.unwrap());
+        let read = read.map(Result::unwrap).collect::<Vec<_>>();
+
+        assert_eq!(vec![data], read);
     }
 
     #[test]
@@ -88,6 +90,8 @@ mod tests {
         let read = ChunkRead::with_chunk_size(1, Cursor::new(data.clone()));
 
         let read = read.collect::<Result<Vec<_>, io::Error>>();
+        let data = data.into_iter().map(|x| vec![x]).collect::<Vec<_>>();
+
         assert!(read.is_ok());
         assert_eq!(data, read.unwrap());
     }

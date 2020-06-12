@@ -2,10 +2,7 @@
 #![allow(missing_docs)]
 
 use crate::chunk::{ChunkRead, CHUNK_SIZE};
-use digest::{
-    generic_array::{ArrayLength, GenericArray},
-    Digest,
-};
+use digest::{generic_array::GenericArray, Digest};
 use std::io::Read;
 use structopt::clap::arg_enum;
 
@@ -56,14 +53,5 @@ fn generic_hash<D: Digest, R: Read>(
     data: &mut ChunkRead<R>,
 ) -> Result<GenericArray<u8, D::OutputSize>, Box<dyn std::error::Error>> {
     let mut hasher = D::new();
-
-    loop {
-        let chunk =
-            Iterator::take(data, CHUNK_SIZE).collect::<Result<Vec<u8>, std::io::Error>>()?;
-        if chunk.is_empty() {
-            break;
-        }
-        hasher.update(chunk);
-    }
     Ok(hasher.finalize())
 }
