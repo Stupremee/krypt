@@ -8,6 +8,7 @@ description = "Krypt is swiss-army knife for encoding, decoding, encryption, dec
 homepage = "https://github.com/Stupremee/krypt"
 documentation = "https://docs.rs/krypt"
 repository = "https://github.com/Stupremee/krypt"
+readme = "README.md"
 
 [lib]
 name = "krypt"
