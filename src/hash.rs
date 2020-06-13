@@ -60,7 +60,9 @@ fn generic_hash<D: Digest, R: Read, W: Write>(
     }
 
     let result = hasher.finalize();
-    std::io::copy(&mut result.as_slice(), output)?;
+    // FIXME: this is probably a very bad way
+    // to copy the data but it works for now.
+    output.write(result.as_slice())?;
     Ok(())
 }
 

@@ -3,13 +3,13 @@
 use crate::app::OutputFormat;
 use std::io::Write;
 
-pub struct FormatWriter {
+pub struct FormatWriter<W: Write> {
     format: OutputFormat,
-    writer: Box<dyn Write>,
+    writer: W,
 }
 
-impl FormatWriter {
-    pub fn new(write: Box<dyn Write>, format: OutputFormat) -> Self {
+impl<W: Write> FormatWriter<W> {
+    pub fn new(write: W, format: OutputFormat) -> Self {
         Self {
             format,
             writer: write,
@@ -17,11 +17,17 @@ impl FormatWriter {
     }
 }
 
-impl Write for FormatWriter {
+impl<W: Write> Write for FormatWriter<W> {
     fn write(&mut self, buf: &[u8]) -> std::io::Result<usize> {
         match self.format {
             OutputFormat::Raw => self.writer.write(buf),
-            OutputFormat::Hex => self.write(hex::encode(buf).as_bytes()),
+            OutputFormat::Hex => {
+                // FIXME: pls fix this. This is not a good way to implement
+                // write but it should work for now.
+                let bytes = hex::encode(buf);
+                write!(self.writer, "{}", bytes)?;
+                Ok(bytes.as_bytes().len())
+            }
         }
     }
 

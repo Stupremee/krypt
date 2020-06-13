@@ -4,8 +4,8 @@ mod app;
 mod log;
 mod write;
 
-use app::{HashMode, Mode, Options, OutputFormat};
-use krypt::chunk::ChunkRead;
+use app::{Mode, Options, OutputFormat};
+use krypt::{chunk::ChunkRead, hash};
 use std::{
     fs::File,
     io::{self, prelude::*, BufReader, BufWriter},
@@ -34,38 +34,37 @@ fn try_main() -> Result<()> {
     color_backtrace::install();
 
     let opt = Options::from_args();
-    let input = get_input(opt.input)?;
-    let output = get_output(opt.output)?;
+    let mode = opt.mode;
+    let output_format = opt.output_format;
 
-    let format = match opt.output_format {
-        Some(f) => f,
-        None => match opt.mode {
-            Mode::Hash(_) => OutputFormat::Hex,
-        },
-    };
-    let output = Box::new(write::FormatWriter::new(output, format));
+    let mut input = get_input(opt.input)?;
 
-    let res = match opt.mode {
-        Mode::Hash(mode) => hash_data(mode, input, output),
+    let output_format = output_format.unwrap_or_else(|| get_default_format(&mode));
+    let mut output = get_output(opt.output, output_format)?;
+
+    let res = match mode {
+        Mode::Hash(mode) => hash::hash_with_algorithm(mode.algorithm, &mut input, &mut output),
     };
     res
 }
 
-fn hash_data(
-    mode: HashMode,
-    input: ChunkRead<Box<dyn Read>>,
-    output: Box<dyn Write>,
-) -> Result<()> {
-    Ok(())
+fn get_default_format(mode: &Mode) -> OutputFormat {
+    match mode {
+        Mode::Hash(_) => OutputFormat::Hex,
+    }
 }
 
-fn get_output(path: Option<PathBuf>) -> Result<Box<dyn Write>> {
+fn get_output(path: Option<PathBuf>, format: OutputFormat) -> Result<Box<dyn Write>> {
     if let Some(path) = path {
         let file = File::open(path)?;
-        Ok(Box::new(BufWriter::new(file)))
+        let writer = BufWriter::new(file);
+        let writer = write::FormatWriter::new(writer, format);
+        Ok(Box::new(writer))
     } else {
         let stdout = io::stdout();
-        Ok(Box::new(BufWriter::new(stdout)))
+        let writer = BufWriter::new(stdout);
+        let writer = write::FormatWriter::new(writer, format);
+        Ok(Box::new(writer))
     }
 }
 

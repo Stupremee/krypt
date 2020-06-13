@@ -50,5 +50,5 @@ pub enum Mode {
 pub struct HashMode {
     /// The algorithm to use.
     #[structopt(name = "ALGORITHM", possible_values = &HashAlgorithm::variants(), case_insensitive = true)]
-    algorithm: HashAlgorithm,
+    pub algorithm: HashAlgorithm,
 }
