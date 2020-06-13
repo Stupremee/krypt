@@ -35,6 +35,7 @@ arg_enum! {
     pub enum OutputFormat {
         Raw,
         Hex,
+        UpperHex,
     }
 }
 
